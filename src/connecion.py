@@ -1,6 +1,6 @@
 import psycopg2
 def conneccion():
-    PG_HOST = 'yyyyyyyyyy'
+    PG_HOST = 'dpg-chiqk45269v2e2bblbgg-a'
     PG_USER = 'db_api_flask_user'
     PG_PASSWORD = 'XBfDf1jS5To8OYMNT3zE1ImVglTdZOKk'
     PG_DB = 'db_api_flask'
