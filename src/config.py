@@ -1,5 +1,5 @@
 class DevelopmentConfig():
-    DEBUG = True
+    DEBUG = False
     
 
 config = {
