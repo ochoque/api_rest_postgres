@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request
 import psycopg2
 #from decouple import config
-##from flask_cors import CORS, cross_origin
+from flask_cors import CORS, cross_origin
 
 from config import config
 from connecion import conneccion
@@ -10,7 +10,7 @@ from connecion import conneccion
 app = Flask(__name__)
 
 # CORS(app)
-##CORS(app, resources={r"/cursos/*": {"origins": "http://localhost"}})
+CORS(app, resources={r"/usuarios/*": {"origins": "http://localhost"}})
 
 ##conexion = MySQL(app)
 # @cross_origin
@@ -85,6 +85,26 @@ def registrar_curso():
     except Exception as ex:
             return jsonify({'mensaje': "Error", 'exito': False})
     
+@app.route('/usuarios/<codigo>', methods=['PUT'])
+def actualizar_curso(codigo):
+    try:
+        usuario = leer_usuario(codigo)
+        if usuario != None:
+            conn = conneccion()
+            cur = conn.cursor()
+            cur.execute("""UPDATE usuarios SET nombre=%s, primer_apellido=%s, segundo_apellido=%s,
+            fecha_nacimiento=%s WHERE cedula_identidad=%s""",
+                        (request.json['nombre'], request.json['primer_apellido'],request.json['segundo_apellido'],request.json['fecha_nacimiento'],codigo))
+            conn.commit()
+                     
+            return jsonify({'mensaje': "Curso actualizado.", 'exito': True})
+        else:
+                return jsonify({'mensaje': "Curso no encontrado.", 'exito': False})
+    except Exception as ex:
+            return jsonify({'mensaje': "Error", 'exito': False})
+    
+
+
 @app.route('/usuarios/<codigo>', methods=['DELETE'])
 def eliminar_curso(codigo):
     try:
@@ -101,6 +121,22 @@ def eliminar_curso(codigo):
     except Exception as ex:
         return jsonify({'mensaje': "Error", 'exito': False})
 
+### PROMEDIO DE EDADES
+@app.route('/usuarios/promedio-edad',methods=['GET'])
+def promedio_ed():
+    try:
+        conn = conneccion()
+        cur = conn.cursor()
+        cur.execute("""select avg(extract(year from age(now(),fecha_nacimiento))) 
+        as promedio_edades from usuarios""")
+        datos=cur.fetchone()
+        if datos != None:
+            print('verdad')
+            return jsonify({'promedio_edad': datos[0], 'exito': True})
+        else:
+            return jsonify({'mensaje': "No existe promedio.", 'exito': False})
+    except Exception as ex:
+        return jsonify({'mensaje': "Error", 'exito': False})
 
 
 
